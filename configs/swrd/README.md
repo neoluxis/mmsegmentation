@@ -5,19 +5,25 @@ annotations into coarse semantic segmentation masks for MMSegmentation.
 
 ## Prepare Dataset
 
+The default config expects the dataset to be mounted in Docker as:
+
+```text
+/datasets/SWRD/steel-tube-dataset-all/yolo
+```
+
 From the workspace root:
 
 ```shell
 python onedl-mmsegmentation/tools/dataset_converters/swrd.py \
-  "datasets/SWRD 数据集/steel-tube-dataset-all/yolo" \
+  "/datasets/SWRD/steel-tube-dataset-all/yolo" \
   --overwrite
 ```
 
 The script writes masks to:
 
 ```text
-datasets/SWRD 数据集/steel-tube-dataset-all/yolo/annotations/train2021
-datasets/SWRD 数据集/steel-tube-dataset-all/yolo/annotations/val2021
+/datasets/SWRD/steel-tube-dataset-all/yolo/annotations/train2021
+/datasets/SWRD/steel-tube-dataset-all/yolo/annotations/val2021
 ```
 
 Mask label `0` is background. Original YOLO labels `0-7` are converted to

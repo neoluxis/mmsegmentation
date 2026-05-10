@@ -1,6 +1,6 @@
 # dataset settings
 dataset_type = 'SWRDDataset'
-data_root = '../datasets/SWRD 数据集/steel-tube-dataset-all/yolo'
+data_root = '/datasets/SWRD/steel-tube-dataset-all/yolo'
 crop_size = (512, 512)
 train_pipeline = [
     dict(type='LoadImageFromFile'),
