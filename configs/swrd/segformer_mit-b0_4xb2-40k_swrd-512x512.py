@@ -1,8 +1,8 @@
 _base_ = [
-    '../_base_/models/segformer_mit-b0.py',
+    './segformer_mit-b0.py',
     '../_base_/datasets/swrd.py',
     '../_base_/default_runtime.py',
-    '../_base_/schedules/schedule_40k.py',
+    './schedule_80k.py',
 ]
 
 crop_size = (512, 512)
