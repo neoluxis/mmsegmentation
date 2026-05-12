@@ -11,6 +11,42 @@ from mmengine.runner import Runner
 from mmseg.registry import RUNNERS
 
 
+def find_next_run_dir(base_dir):
+    """Find the next indexed run directory under a base work directory."""
+    if not osp.isdir(base_dir):
+        return osp.join(base_dir, 'run_001')
+
+    indices = []
+    for name in os.listdir(base_dir):
+        if not name.startswith('run_'):
+            continue
+        index = name[4:]
+        if index.isdigit():
+            indices.append(int(index))
+
+    next_index = max(indices, default=0) + 1
+    return osp.join(base_dir, f'run_{next_index:03d}')
+
+
+def find_latest_run_dir(base_dir):
+    """Find the latest indexed run directory under a base work directory."""
+    if not osp.isdir(base_dir):
+        return None
+
+    runs = []
+    for name in os.listdir(base_dir):
+        if not name.startswith('run_'):
+            continue
+        index = name[4:]
+        run_dir = osp.join(base_dir, name)
+        if index.isdigit() and osp.isdir(run_dir):
+            runs.append((int(index), run_dir))
+
+    if not runs:
+        return None
+    return max(runs)[1]
+
+
 def parse_args():
     parser = argparse.ArgumentParser(description='Train a segmentor')
     parser.add_argument('config', help='train config file path')
@@ -60,14 +96,26 @@ def main():
     if args.cfg_options is not None:
         cfg.merge_from_dict(args.cfg_options)
 
-    # work_dir is determined in this priority: CLI > segment in file > filename
+    # work_dir is determined in this priority: CLI > segment in file > filename.
+    # Fresh runs are saved in indexed child directories to avoid overwriting
+    # checkpoints. Resuming reuses the specified work_dir, or the latest indexed
+    # child directory when work_dir is inferred from the config.
     if args.work_dir is not None:
-        # update configs according to CLI args if args.work_dir is not None
-        cfg.work_dir = args.work_dir
+        base_work_dir = args.work_dir
     elif cfg.get('work_dir', None) is None:
         # use config filename as default work_dir if cfg.work_dir is None
-        cfg.work_dir = osp.join('./work_dirs',
-                                osp.splitext(osp.basename(args.config))[0])
+        base_work_dir = osp.join('./work_dirs',
+                                 osp.splitext(osp.basename(args.config))[0])
+    else:
+        base_work_dir = cfg.work_dir
+
+    if args.resume:
+        if args.work_dir is not None:
+            cfg.work_dir = base_work_dir
+        else:
+            cfg.work_dir = find_latest_run_dir(base_work_dir) or base_work_dir
+    else:
+        cfg.work_dir = find_next_run_dir(base_work_dir)
 
     # enable automatic-mixed-precision training
     if args.amp is True:

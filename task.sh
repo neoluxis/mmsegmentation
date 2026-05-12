@@ -5,5 +5,4 @@ source /home/neolux/.zshrc
 conda activate mmseg1
 source ../envs 
 
-python tools/train.py $1
-
+python tools/train.py "$@"
