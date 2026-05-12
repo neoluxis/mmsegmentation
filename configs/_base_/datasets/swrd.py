@@ -2,7 +2,7 @@ import os
 
 # dataset settings
 dataset_type = 'SWRDDataset'
-data_root = f'{os.getenv("DATASET_PATH")}/SWRD/steel-tube-dataset-all/yolo'
+data_root = f'{os.getenv("DATASET_PATH", "/dataset")}/SWRD/steel-tube-dataset-all/yolo'
 crop_size = (512, 512)
 train_pipeline = [
     dict(type='LoadImageFromFile'),
