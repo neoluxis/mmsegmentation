@@ -46,3 +46,7 @@ param_scheduler = [
 train_dataloader = dict(batch_size=2, num_workers=4)
 val_dataloader = dict(batch_size=1, num_workers=4)
 test_dataloader = val_dataloader
+
+train_cfg = dict(type='IterBasedTrainLoop', max_iters=40000, val_interval=4000)
+default_hooks = dict(
+    checkpoint=dict(type='CheckpointHook', by_epoch=False, interval=4000))

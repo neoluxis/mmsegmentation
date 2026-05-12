@@ -32,9 +32,10 @@ from .transforms import (CLAHE, AdjustGamma, Albu, BioMedical3DPad,
                          BioMedical3DRandomCrop, BioMedical3DRandomFlip,
                          BioMedicalGaussianBlur, BioMedicalGaussianNoise,
                          BioMedicalRandomGamma, ConcatCDInput, GenerateEdge,
-                         LoadAnnotations, LoadBiomedicalAnnotation,
-                         LoadBiomedicalData, LoadBiomedicalImageFromFile,
-                         LoadImageFromNDArray, LoadMultipleRSImageFromFile,
+                         GaussianDenoise, LoadAnnotations,
+                         LoadBiomedicalAnnotation, LoadBiomedicalData,
+                         LoadBiomedicalImageFromFile, LoadImageFromNDArray,
+                         LoadMultipleRSImageFromFile,
                          LoadSingleRSImageFromFile, PackSegInputs,
                          PhotoMetricDistortion, RandomCrop, RandomCutOut,
                          RandomMosaic, RandomRotate, RandomRotFlip, Rerange,
@@ -72,5 +73,5 @@ __all__ = [
     'MapillaryDataset_v2', 'Albu', 'LEVIRCDDataset',
     'LoadMultipleRSImageFromFile', 'LoadSingleRSImageFromFile',
     'ConcatCDInput', 'BaseCDDataset', 'DSDLSegDataset', 'BDD100KDataset',
-    'NYUDataset', 'HSIDrive20Dataset', 'SWRDDataset'
+    'NYUDataset', 'HSIDrive20Dataset', 'SWRDDataset', 'GaussianDenoise'
 ] + onedl_dataset_types

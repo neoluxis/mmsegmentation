@@ -205,6 +205,47 @@ class CLAHE(BaseTransform):
 
 
 @TRANSFORMS.register_module()
+class GaussianDenoise(BaseTransform):
+    """Apply 2D Gaussian blur to denoise an image.
+
+    This transform is intended for regular 2D images with shape ``H x W`` or
+    ``H x W x C``. It is lighter than the biomedical 3D Gaussian transforms and
+    fits SWRD X-ray image preprocessing experiments.
+
+    Required Keys:
+
+    - img
+
+    Modified Keys:
+
+    - img
+
+    Args:
+        kernel_size (int): Odd Gaussian kernel size. Default: 5.
+        sigma (float): Gaussian sigma. ``0`` lets OpenCV infer it from the
+            kernel size. Default: 0.
+    """
+
+    def __init__(self, kernel_size: int = 5, sigma: float = 0.) -> None:
+        assert isinstance(kernel_size, int)
+        assert kernel_size > 0 and kernel_size % 2 == 1
+        assert isinstance(sigma, (float, int)) and sigma >= 0
+        self.kernel_size = kernel_size
+        self.sigma = sigma
+
+    def transform(self, results: dict) -> dict:
+        img = np.array(results['img'])
+        results['img'] = cv2.GaussianBlur(
+            img, (self.kernel_size, self.kernel_size), self.sigma)
+        return results
+
+    def __repr__(self):
+        repr_str = self.__class__.__name__
+        repr_str += f'(kernel_size={self.kernel_size}, sigma={self.sigma})'
+        return repr_str
+
+
+@TRANSFORMS.register_module()
 class RandomCrop(BaseTransform):
     """Random crop the image & seg.
 
