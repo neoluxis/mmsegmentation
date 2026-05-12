@@ -276,11 +276,17 @@ class EncoderDecoder(BaseSegmentor):
                 y1 = max(y2 - h_crop, 0)
                 x1 = max(x2 - w_crop, 0)
                 crop_img = inputs[:, :, y1:y2, x1:x2]
-                # change the image shape to patch shape
-                batch_img_metas[0]['img_shape'] = crop_img.shape[2:]
+                # Change shape metadata to patch shape. Some heads, such as
+                # Mask2FormerHead, use pad_shape to resize logits in predict().
+                crop_img_metas = [meta.copy() for meta in batch_img_metas]
+                for meta in crop_img_metas:
+                    meta['img_shape'] = crop_img.shape[2:]
+                    meta['pad_shape'] = crop_img.shape[2:]
+                    if 'padding_size' in meta:
+                        meta['padding_size'] = [0, 0, 0, 0]
                 # the output of encode_decode is seg logits tensor map
                 # with shape [N, C, H, W]
-                crop_seg_logit = self.encode_decode(crop_img, batch_img_metas)
+                crop_seg_logit = self.encode_decode(crop_img, crop_img_metas)
                 preds += F.pad(crop_seg_logit,
                                (int(x1), int(preds.shape[3] - x2), int(y1),
                                 int(preds.shape[2] - y2)))
