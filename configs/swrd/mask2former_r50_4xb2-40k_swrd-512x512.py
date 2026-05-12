@@ -1,7 +1,5 @@
 _base_ = [
     '../mask2former/mask2former_r50_8xb2-160k_ade20k-512x512.py',
-    '../_base_/datasets/swrd.py',
-    '../_base_/schedules/schedule_40k.py',
 ]
 
 import os
@@ -9,7 +7,7 @@ import os
 crop_size = (512, 512)
 num_classes = 9
 dataset_type = 'SWRDDataset'
-data_root = f'{os.getenv("DATASET_PATH")}/SWRD/steel-tube-dataset-all/yolo'
+data_root = f'{os.getenv("DATASET_PATH", "/dataset")}/SWRD/steel-tube-dataset-all/yolo'
 
 data_preprocessor = dict(size=crop_size)
 
