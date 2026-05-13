@@ -2,8 +2,8 @@
 """Plot MMSegmentation scalar curves from ``vis_data/scalars.json``.
 
 This helper targets MMEngine's local visualizer output. It accepts either a
-training work directory, a timestamp run directory, a ``vis_data`` directory, or
-the scalar JSON file itself.
+training work directory, an indexed run directory, a timestamp run directory, a
+``vis_data`` directory, or the scalar JSON file itself.
 """
 
 import argparse
@@ -53,16 +53,12 @@ def resolve_scalars_path(path: Path) -> Path:
     if path.is_file():
         return path
 
-    direct = path / 'scalars.json'
-    if direct.exists():
-        return direct
-
-    vis_direct = path / 'vis_data' / 'scalars.json'
-    if vis_direct.exists():
-        return vis_direct
+    for direct in (path / 'scalars.json', path / 'vis_data' / 'scalars.json'):
+        if direct.exists():
+            return direct
 
     candidates = sorted(
-        path.glob('*/vis_data/scalars.json'),
+        path.rglob('vis_data/scalars.json'),
         key=lambda p: p.stat().st_mtime,
         reverse=True)
     if candidates:
