@@ -2,11 +2,25 @@
 import argparse
 from pathlib import Path
 
+import numpy as np
 import torch
 from mmengine import Config, digit_version
+from mmengine.registry import init_default_scope
 from mmengine.runner import load_checkpoint
 from torch import nn
 from torch.nn import functional as F
+
+if not hasattr(np, 'sctypes'):
+    np.sctypes = dict(
+        float=[np.float16, np.float32, np.float64],
+        int=[np.int8, np.int16, np.int32, np.int64],
+        uint=[np.uint8, np.uint16, np.uint32, np.uint64],
+        complex=[np.complex64, np.complex128],
+        others=[np.bool_, np.object_, np.bytes_, np.str_])
+if not hasattr(np, 'complex'):
+    np.complex = complex
+if not hasattr(np, 'bool'):
+    np.bool = np.bool_
 
 from mmseg.models import build_segmentor
 
@@ -49,7 +63,18 @@ class ONNXSegmentorWrapper(nn.Module):
         self.resize_output = resize_output
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
-        seg_logits = self.model(inputs, mode='tensor')
+        if self.model.decode_head.__class__.__name__ == 'Mask2FormerHead':
+            image_shape = tuple(inputs.shape[2:])
+            batch_img_metas = [
+                dict(
+                    ori_shape=image_shape,
+                    img_shape=image_shape,
+                    pad_shape=image_shape,
+                    padding_size=[0, 0, 0, 0])
+            ] * inputs.shape[0]
+            seg_logits = self.model.inference(inputs, batch_img_metas)
+        else:
+            seg_logits = self.model(inputs, mode='tensor')
         if self.resize_output:
             seg_logits = F.interpolate(
                 seg_logits,
@@ -104,12 +129,12 @@ def build_input_shape(shape):
 
 
 def build_model(config, checkpoint=None):
+    init_default_scope('mmseg')
     cfg = Config.fromfile(config)
     cfg.model.pretrained = None
     cfg.model.train_cfg = None
 
-    model = build_segmentor(
-        cfg.model, train_cfg=None, test_cfg=cfg.get('test_cfg'))
+    model = build_segmentor(cfg.model, train_cfg=None, test_cfg=None)
     model = _convert_batchnorm(model)
     if checkpoint:
         load_checkpoint(model, checkpoint, map_location='cpu')
@@ -122,6 +147,7 @@ def export_onnx(model, input_shape, output_file, opset_version,
     wrapper = ONNXSegmentorWrapper(model, resize_output=resize_output).eval()
     dummy_input = torch.randn(*input_shape)
     output_file.parent.mkdir(parents=True, exist_ok=True)
+    use_legacy_export = model.decode_head.__class__.__name__ == 'Mask2FormerHead'
 
     dynamic_axes = None
     if dynamic_export:
@@ -150,7 +176,8 @@ def export_onnx(model, input_shape, output_file, opset_version,
         export_params=True,
         keep_initializers_as_inputs=False,
         do_constant_folding=True,
-        opset_version=opset_version)
+        opset_version=opset_version,
+        dynamo=not use_legacy_export)
 
 
 def verify_onnx(output_file):
