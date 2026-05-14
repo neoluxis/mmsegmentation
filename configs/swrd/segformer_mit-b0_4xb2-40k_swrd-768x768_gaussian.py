@@ -1,4 +1,4 @@
-_base_ = ['./segformer_mit-b0_4xb2-40k_swrd-512x512.py']
+_base_ = ['./segformer_mit-b0_4xb2-40k_swrd-768x768.py']
 
 crop_size = (768, 768)
 

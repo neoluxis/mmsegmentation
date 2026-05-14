@@ -59,7 +59,7 @@ param_scheduler = [
 ]
 
 train_dataloader = dict(
-    batch_size=2,
+    batch_size=4,
     num_workers=4,
     dataset=dict(pipeline=train_pipeline))
 val_dataloader = dict(batch_size=1, num_workers=4)
