@@ -67,5 +67,11 @@ val_dataloader = dict(
         pipeline=test_pipeline))
 test_dataloader = val_dataloader
 
-val_evaluator = dict(type='IoUMetric', iou_metrics=['mIoU'])
+# 评估指标配置
+# 支持的 iou_metrics: 'mIoU'(IoU和Acc), 'mDice'(Dice), 'mFscore'(F-score/Precision/Recall)
+# 根据任务要求: IoU>0.7, aAcc(像素准确率)>0.75, mIoU>0.8
+val_evaluator = dict(
+    type='IoUMetric',
+    iou_metrics=['mIoU', 'mDice', 'mFscore'],
+    nan_to_num=0)
 test_evaluator = val_evaluator
