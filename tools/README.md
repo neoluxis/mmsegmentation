@@ -25,7 +25,9 @@
 | `analysis_tools/confusion_matrix.py` | 根据分割预测结果生成混淆矩阵。 | `python tools/analysis_tools/confusion_matrix.py <config> <prediction_path> <save_dir>` |
 | `analysis_tools/get_flops.py` | 统计模型 FLOPs 和参数量。 | `python tools/analysis_tools/get_flops.py <config> --shape 512 512` |
 | `analysis_tools/plot_scalars.py` | 绘制 MMEngine 本地 visualizer 写出的 scalar 曲线，并导出 `scalars.csv`。可传入 work dir、编号 run 目录、timestamp 目录、`vis_data` 目录或 `scalars.json`。 | `python tools/analysis_tools/plot_scalars.py <work_dir_or_scalars_json>` |
-| `analysis_tools/riawelc_infer.py` | 对 RIAWELC 这类按类别文件夹组织、没有像素级标注的数据做跨数据集推理，输出叠加图和 `summary.csv`。 | `python tools/analysis_tools/riawelc_infer.py <config> <checkpoint> --data-root <root>` |
+| `analysis_tools/riawelc_infer.py` | 对 RIAWELC 这类按类别文件夹组织、没有像素级标注的数据做跨数据集推理，输出 `summary.csv`、`folder_summary.csv`，可选叠加图。 | `python tools/analysis_tools/riawelc_infer.py <config> <checkpoint> --data-root <root> [--no-overlays]` |
+| `analysis_tools/run_riawelc_cross_dataset.sh` | 批量对 `configs/swrd/*40k_swrd-512x512*.py` 与对应 `iter_40000.pth` 做 RIAWELC 跨数据集推理。 | `bash tools/analysis_tools/run_riawelc_cross_dataset.sh` |
+| `analysis_tools/run_swrd_val_visualizations.sh` | 批量使用 40000 轮权重在 SWRD 验证集上测试，并保存预测可视化图片。 | `bash tools/analysis_tools/run_swrd_val_visualizations.sh` |
 | `analysis_tools/visualization_cam.py` | 使用 `pytorch-grad-cam` 可视化类别激活图。 | `python tools/analysis_tools/visualization_cam.py <img> <config> <checkpoint>` |
 
 ## 数据集转换工具
