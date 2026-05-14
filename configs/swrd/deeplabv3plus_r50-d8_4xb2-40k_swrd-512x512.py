@@ -14,6 +14,6 @@ model = dict(
     auxiliary_head=dict(num_classes=9),
     test_cfg=dict(mode='slide', crop_size=crop_size, stride=(341, 341)))
 
-train_dataloader = dict(batch_size=8, num_workers=4)
+train_dataloader = dict(batch_size=2, num_workers=4)
 val_dataloader = dict(batch_size=1, num_workers=4)
 test_dataloader = val_dataloader
