@@ -2,10 +2,47 @@
 set -euo pipefail
 
 OUT_ROOT="${OUT_ROOT:-work_dirs/swrd_val_visualizations}"
-CONFIG_GLOB="${CONFIG_GLOB:-configs/swrd/*40k_swrd-512x512*.py}"
+CONFIG_GLOB="${CONFIG_GLOB:-configs/swrd/segformer_mit-b2_8xb2-160k_swrd-*.py}"
+CHECKPOINT_ITER="${CHECKPOINT_ITER:-}"
 export MPLCONFIGDIR="${MPLCONFIGDIR:-/tmp/matplotlib-mmseg}"
 
 mkdir -p "${OUT_ROOT}" "${MPLCONFIGDIR}"
+
+infer_iter() {
+  local name="$1"
+  if [[ -n "${CHECKPOINT_ITER}" ]]; then
+    echo "${CHECKPOINT_ITER}"
+  elif [[ "${name}" =~ _([0-9]+)k_ ]]; then
+    echo "$((BASH_REMATCH[1] * 1000))"
+  else
+    echo "40000"
+  fi
+}
+
+find_checkpoint() {
+  local name="$1"
+  local iter="$2"
+  local work_dir="work_dirs/${name}"
+  local marker=""
+  local checkpoint=""
+
+  marker="$(find "${work_dir}" -name last_checkpoint -type f -print 2>/dev/null | sort | tail -n 1 || true)"
+  if [[ -n "${marker}" ]]; then
+    checkpoint="$(tr -d '\r\n' < "${marker}")"
+    if [[ -n "${checkpoint}" && -f "${checkpoint}" ]]; then
+      echo "${checkpoint}"
+      return
+    fi
+  fi
+
+  checkpoint="$(find "${work_dir}" -name 'best_mIoU*.pth' -type f -print 2>/dev/null | sort | tail -n 1 || true)"
+  if [[ -n "${checkpoint}" ]]; then
+    echo "${checkpoint}"
+    return
+  fi
+
+  find "${work_dir}" -name "iter_${iter}.pth" -type f -print 2>/dev/null | sort | tail -n 1 || true
+}
 
 configs=( ${CONFIG_GLOB} )
 if [[ ${#configs[@]} -eq 0 || ! -e "${configs[0]}" ]]; then
@@ -15,15 +52,16 @@ fi
 
 for config in "${configs[@]}"; do
   name="$(basename "${config}" .py)"
-  checkpoint="$(find "work_dirs/${name}" -path '*/iter_40000.pth' -print | sort | tail -n 1)"
+  iter="$(infer_iter "${name}")"
+  checkpoint="$(find_checkpoint "${name}" "${iter}")"
 
   if [[ -z "${checkpoint}" ]]; then
-    echo "skip ${name}: iter_40000.pth not found"
+    echo "skip ${name}: checkpoint not found (looked for last_checkpoint, best_mIoU*.pth, iter_${iter}.pth)"
     continue
   fi
 
   out_dir="${OUT_ROOT}/${name}"
-  echo "visualize ${name}"
+  echo "visualize ${name} with ${checkpoint}"
   python tools/test.py \
     "${config}" \
     "${checkpoint}" \
