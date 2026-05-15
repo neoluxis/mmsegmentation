@@ -15,14 +15,14 @@ class SWRDDataset(BaseSegDataset):
     METAINFO = dict(
         classes=(
             'background',
-            'air-hole12(hollow-bead)-142',
-            'air-hole7-028',
-            'broken-arc2-064',
-            'broken-arc2-156',
-            'air-hole4(hollow-bead)-105',
-            'broken-arc3(air-hole)-282',
-            'crack043',
-            'air-hole10-026',
+            'air-hole',
+            'bite-edge',
+            'broken-arc',
+            'crack',
+            'hollow-bead',
+            'overlap',
+            'slag-inclusion',
+            'unfused',
         ),
         palette=[
             [0, 0, 0],

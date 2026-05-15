@@ -14,6 +14,17 @@ import pandas as pd
 ROOT = Path("work_dirs")
 OUT = ROOT / "analysis_outputs"
 
+SWRD_CLASS_ALIASES = {
+    "air-hole12(hollow-bead)-142": "air-hole",
+    "air-hole7-028": "bite-edge",
+    "broken-arc2-064": "broken-arc",
+    "broken-arc2-156": "crack",
+    "air-hole4(hollow-bead)-105": "hollow-bead",
+    "broken-arc3(air-hole)-282": "overlap",
+    "crack043": "slag-inclusion",
+    "air-hole10-026": "unfused",
+}
+
 
 def parse_exp_from_name(exp: str) -> dict[str, str]:
     model = exp
@@ -171,7 +182,7 @@ def parse_log(path: Path) -> dict | None:
                 try:
                     table.append(
                         {
-                            "Class": parts[0],
+                            "Class": SWRD_CLASS_ALIASES.get(parts[0], parts[0]),
                             "IoU": float(parts[1]),
                             "Acc": float(parts[2]),
                             "Dice": float(parts[3]) if len(parts) > 3 else None,
