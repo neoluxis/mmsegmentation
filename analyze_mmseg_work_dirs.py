@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 
-ROOT = Path("mmsegmentation/work_dirs")
+ROOT = Path("work_dirs")
 OUT = ROOT / "analysis_outputs"
 
 
