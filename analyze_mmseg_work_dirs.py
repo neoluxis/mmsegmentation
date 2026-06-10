@@ -43,6 +43,7 @@ def parse_exp_from_name(exp: str) -> dict[str, str]:
     for key in [
         "segformer_mit-b0",
         "segformer_mit-b2",
+        "segformer_mit-b4",
         "deeplabv3plus_r50-d8",
         "mask2former_r50",
         "pspnet_r50-d8",

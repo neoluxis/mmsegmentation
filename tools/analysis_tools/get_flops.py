@@ -3,11 +3,24 @@ import argparse
 import tempfile
 from pathlib import Path
 
+import numpy as np
 import torch
 from mmengine import Config, DictAction
 from mmengine.logging import MMLogger
 from mmengine.model import revert_sync_batchnorm
 from mmengine.registry import init_default_scope
+
+if not hasattr(np, 'sctypes'):
+    np.sctypes = dict(
+        float=[np.float16, np.float32, np.float64],
+        int=[np.int8, np.int16, np.int32, np.int64],
+        uint=[np.uint8, np.uint16, np.uint32, np.uint64],
+        complex=[np.complex64, np.complex128],
+        others=[np.bool_, np.object_, np.bytes_, np.str_])
+if not hasattr(np, 'complex'):
+    np.complex = complex
+if not hasattr(np, 'bool'):
+    np.bool = np.bool_
 
 from mmseg.models import BaseSegmentor
 from mmseg.registry import MODELS
