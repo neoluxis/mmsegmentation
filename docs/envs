@@ -1,0 +1,5 @@
+export GRAD=/home/neolux/workspace/2026/grad/code
+export DATASET_PATH=$GRAD/../datasets
+
+alias dbuild='docker build -t mmsegmentation -f $GRAD/onedl-mmsegmentation/docker/Dockerfile $GRAD/onedl-mmsegmentation'
+alias drun='docker run --gpus all --rm --shm-size=8g -it -v $GRAD/work_dirs:/onedl/onedl-mmsegmentation/work_dirs -v $GRAD/../数据集:/datasets mmsegmentation:latest'
